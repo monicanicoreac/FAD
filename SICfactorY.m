@@ -13,6 +13,11 @@ if err == 0
         Mkba = 1;
         Mkmc = 1;
         Mkbc = 1;
+    elseif (flaw == 10)
+        Mkma = 1;
+        Mkba = 1;
+        Mkmc = 1;
+        Mkbc = 1;
 %     elseif (a <= 0.005*T) || (a >= 0.9*T) || (a < 0.1*c) || (a > c) || (L < 0.5*T)
 %         % Use 2D solution
 %         [Mkma, Mkba] = SIMfactor_Mk(weld, a, T, L, tw, phi, radius);

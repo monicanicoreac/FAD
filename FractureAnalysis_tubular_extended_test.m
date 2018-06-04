@@ -11,8 +11,8 @@ row_num         = 1;
 shift_row       = 1;
 specimen_type   = 'tubular';
 % specimen_treat  = 'per_specimen';
-specimen_treat  = 'average_ctod';
-% specimen_treat  = 'magic_average_ctod';
+% % specimen_treat  = 'average_ctod';
+specimen_treat  = 'magic_average_ctod';
 fname           = [specimen_type, '_', specimen_treat, '_to_Arpi.xlsx'];
 if exist(fname, 'file')
     delete(fname)
@@ -21,11 +21,11 @@ end
 [batch_name, CTOD, Lr_trunc_flag, Lr_sup] = get_ctod_data(specimen_type);
 
 % get rid of the first specimen type, A
-idx                     = 1;
-batch_name(idx)         = [];
-CTOD(idx,:)             = [];
-Lr_trunc_flag(idx,:)    = [];
-Lr_sup(idx,:)           = [];
+% idx                     = 1;
+% batch_name(idx)         = [];
+% CTOD(idx,:)             = [];
+% Lr_trunc_flag(idx,:)    = [];
+% Lr_sup(idx,:)           = [];
 
 switch lower(specimen_treat)
     case 'per_specimen'
@@ -36,7 +36,7 @@ switch lower(specimen_treat)
         CTOD = mean(CTOD,2,'omitnan');
     case 'magic_average_ctod'
         % who knows how the "averaged" ctod values are calculated
-        CTOD = [0.2100;    0.1530;    1.1100;   0.4700];
+        CTOD = [0.17; 0.2100;    0.1530;    1.1100;   0.4700];
         CTOD = CTOD(:); % just in case
     otherwise
        error(['Unknown specimen treatment (specimen_treat): ', specimen_treat]) 
@@ -44,13 +44,13 @@ end
 
 load('tubular.mat')
 
-ctodLS_tub(idx,:) = [];
-ctodLS_tub(idx,:) = [];
-forces_tub(idx,:) = [];
-ratio(idx,:)      = [];
-SCF_tub(idx,:)    = [];
-sigmaSd(idx,:)    = [];
-tubular(idx,:)    = [];
+% ctodLT_tub(idx,:) = [];
+% ctodLS_tub(idx,:) = [];
+% forces_tub(idx,:) = [];
+% ratio(idx,:)      = [];
+% SCF_tub(idx,:)    = [];
+% sigmaSd(idx,:)    = [];
+% tubular(idx,:)    = [];
 
 n_batch = length(batch_name);
 
@@ -143,9 +143,7 @@ for ii = 1:n_batch
         %     fyT = fy;
         %     fuT = fu;
     end
-    % Increase in strain (eq. 8 in BS7910)
-    DeltaEpsilon = 0.0375 * (1 - 0.001 * fyT);
-    FADtype = 1; % curve suitable for materials that do not exhibit a yield discontinuity
+    
     % ---------------------------------------------------------------------
     % PERMANENT STRESS ULS
     % ---------------------------------------------------------------------
@@ -176,16 +174,17 @@ for ii = 1:n_batch
     % write the header: column names
     if index == 1
         xlRange = [ 'A', num2str(1)];
-        xlswrite(fname, {'batch', 'specimen', 'E', 'fy', 'fu', '??', 'FADtype', 'Kr', 'Lr'}, 'Sheet1', xlRange);
-        xlswrite(fname, {'batch', 'specimen', 'CTOD', 'KI', 'Kmat', 'rho', 'Kr', 'Lr', 'Lr_trunc_flag', 'Lr_sup'}, 'Sheet2', xlRange);
+%         xlswrite(fname, {'batch', 'specimen', 'CTOD', 'KI', 'Kmat', 'rho', 'Kr', 'Lr', 'Lr_trunc_flag', 'Lr_sup'}, 'Sheet1', xlRange);
     end
+    
     % loop over the specimens in a given batch
     for jj = 1:n_specimen
         ctod            = CTOD(index,jj);
-        ctodLT          = ctod;
-        ctodLS          = ctod;
+        ctodLT          = ctodLT_tub(index,1);
+        ctodLS          = ctodLS_tub(index,1);
 % %         ctodLT          = ctodLT_tub(index,1);
 % %         ctodLS          = ctodLS_tub(index,1);
+    
         % T-stress
         [ Tstr_a, Tstr_c ] = T_stress( a, c, T, sigmaSdm, sigmaSdb, flaw, W );
         %
@@ -339,18 +338,17 @@ for ii = 1:n_batch
 %         end
         batch                           = batch_name{ii};
         xlRange                         = [ 'A', num2str(row_num + shift_row)];
-        xlswrite(fname, {batch, specimen, E, fyT, fuT, DeltaEpsilon, FADtype, Kr, Lr}, 'Sheet1', xlRange);
-        xlswrite(fname, {batch, specimen, ctod, KI, Kmat, rho, Kr, Lr, Lr_tf, Lr_s}, 'Sheet2', xlRange);
+%         xlswrite(fname, {batch, specimen, ctod, KI, Kmat, rho, Kr, Lr, Lr_tf, Lr_s}, 'Sheet1', xlRange);
         row_num     = row_num + 1;
         specimen    = specimen + 1;
     end
-    OUT(index,1) = sigmaSdm+sigmaSdb;
-    OUT(index,2) = sigmaResM;
-    OUT(index,3) = sigmaResB;
-    OUT(index,4) = Ksb;
-    OUT(index,5) = KI;
-    OUT(index,6) = rho;
-    OUT(index,7) = Kmat;
-    OUT(index,8) = Kr;
-    OUT(index,9) = Lr;
+OUT(index,1) = sigmaSdm+sigmaSdb;
+OUT(index,2) = sigmaResM;
+OUT(index,3) = sigmaResB;
+OUT(index,4) = Ksb;
+OUT(index,5) = KI;
+OUT(index,6) = rho;
+OUT(index,7) = Kmat;
+OUT(index,8) = Kr;
+OUT(index,9) = Lr;    
 end

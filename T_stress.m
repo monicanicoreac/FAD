@@ -89,13 +89,24 @@ sigmaref_TT = sqrt(3)*sigmaSdm/(2*(1-2*a/W));
 betaSref_TT = sigmaref_TT * (-1.1547 + 1.1476 * (2*a/W) -2.4091 * (2*a/W)^2 + 4.059 * (2*a/W)^3 -1.9907 * (2*a/W)^4);
 % betaSref_TT = sigmaref_TT * (-1.1547 + 1.1511 * (2*a/W) + -0.7826 * (2*a/W)^2 + 0.4751 * (2*a/W)^3 + -0.1761 * (2*a/W)^4);
 
+%% Cracks at the edge of circular hole
+sigmaref_EH = sqrt(3)*sigmaSdm/(2*(1-2*a/W));
+betaSref_EH = sigmaref_EH * (-0.65);
+%% Double edge-crack plate: uniaxial tension
+sigmaref_DECT = sigmaSdm * sqrt(3)/(2*(1+log((0.5*W-a)/(0.5*W-2*a)))*(1-2*2*a/W));
+betaSref_DECT = sigmaref_DECT * (-0.5889 - 0.0097*(4*a/W) + 1.1103 * (4*a/W)^2 - 1.3852 * (4*a/W)^3 + 0.6573 * (4*a/W)^4);
+
 % Bending or tension
 if (sigmaSdb <= 0.5*sigmaSdm) && (flaw == 2 || flaw == 5)
     Tstr_a = min(0, betaSref_am);
 elseif (sigmaSdb > 0.5*sigmaSdm) && (flaw == 2 || flaw == 5)
     Tstr_a = min(0, betaSref_ab);
-elseif (flaw == 1) || (flaw == 3) || (flaw == 9) % through thickness or trough width 
+elseif (flaw == 1) || (flaw == 3) % through thickness or trough width 
     Tstr_a = min(0, betaSref_TT);
+elseif (flaw == 9)
+    Tstr_a = min(0, betaSref_EH);
+elseif (flaw == 10)
+    Tstr_a = min(0, betaSref_DECT);
 else
     Tstr_a = 0;
 end

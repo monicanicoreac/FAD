@@ -1,4 +1,4 @@
-function [Lr, Kr_a, Kr_c, Krcr, KI_a, KI_c,rhoa, rhoc, sigmaResM, sigmaResB, Ksb] = Fracture(index, flaw, weld, a, c, T, W, fyT, fuT, fyweldT, fuweldT, E, sigmaSdm, sigmaSdb, Yma, Ymc, Yba, Ybc, Mma, Mmc, Mba, Mbc, Kmat, Kmati)
+function [Lr, Kr_a, Kr_c, Krcr, KI_a, KI_c,rhoa, rhoc, sigmaResM, sigmaResB, Ksb] = Fracture(index, flaw, weld, a, c, T, W, fyT, fuT, fyweldT, fuweldT, E, sigmaSdm, sigmaSdb, Yma, Ymc, Yba, Ybc, Mma, Mmc, Mba, Mbc, Kmat, Kmati, SCF)
 %% Plastic collape parameter Lr 
 % Local collapse analysis:
 % Cut-off value of Lr (to prevent plastic colapse)
@@ -7,7 +7,6 @@ if fyweldT == 0  % no weld
 else
     Lrmax = (fyweldT+fuweldT)/(2*fyweldT);
 end
-% Lrmax = (fy+fu)/(2*fy);
 % P.5 in BS7910:2013 A1 2015 Reference stress and/or limit load solutions for deep notched plates
 if (index >= 19) && (index <= 22)
     constraint = 1;
@@ -17,20 +16,10 @@ end
 
 sigmaref = referenceStress(flaw, constraint, a, c, T, W, sigmaSdb, sigmaSdm);
 if fyweldT == 0
-    Lr = min(Lrmax, sigmaref/fyT);
+    Lr = sigmaref/fyT;
 else
-    Lr = min(Lrmax, sigmaref/fyweldT);
+    Lr = sigmaref/fyweldT;
 end
-% Global analysis:
-% Flow strenght: 
-% fflow = (fyT + fuT) / 2;
-% Lrchord = (fflow / fyT) * (abs(Pa/Pcchord) + (Mai / Mcichord)^2 + abs(Mao/Maochord));
-% Lrbrace = (fflow / fyT) * (abs(Pa/Pcbrace) + (Mai / Mcibrace)^2 + abs(Mao/Maobrace));
-% if (crackLocation == 'chord')
-%     Lr = Lrchord;
-% elseif (crackLocation == 'brace')
-%     Lr = Lrbrace;
-% end
 
 %% Fracture collapse parameter Kr
 
@@ -88,14 +77,18 @@ elseif (weld == 14) || (weld == 24)
     sigmaResB = 0;
     Ksb       = 0;
 end
-
-% Annex R: Plasticity correction factor for secondary stresses
-KIp_a = (Yma * sigmaSdm + Yba * sigmaSdb)*sqrt(pi*a);
-KIp_c = (Ymc * sigmaSdm + Ybc * sigmaSdb)*sqrt(pi*a);
+if (index < 26)
+    KIp_a = (Yma * sigmaSdm + Yba * sigmaSdb)*sqrt(pi*a);
+    KIp_c = (Ymc * sigmaSdm + Ybc * sigmaSdb)*sqrt(pi*a);
+else
+    KIp_a = (Yma * SCF(index-25,1) * sigmaSdm + Yba * sigmaSdb)*sqrt(pi*a);
+    KIp_c = (Ymc * SCF(index-25,1) * sigmaSdm + Ybc * sigmaSdb)*sqrt(pi*a);
+end
 
 KIs_a = (Mma * sigmaResM + Mba * sigmaResB) * sqrt(pi*a);
 KIs_c = (Mmc * sigmaResM + Mbc * sigmaResB) * sqrt(pi*a);
 
+% Annex R: Plasticity correction factor for secondary stresses
 chia = KIs_a * Lr / KIp_a;
 chic = KIs_c * Lr / KIp_c;
 
@@ -126,7 +119,6 @@ KI_a = KIp_a + KIs_a;
 KI_c = KIp_c + KIs_c;
 
 Kr_a = KI_a/Kmat + rhoa;
-% For c (surface point) no correction for crack front length is needed:
 Kr_c = KI_c/Kmat + rhoc;
 
 % Failure assessment diagram

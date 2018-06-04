@@ -1,4 +1,4 @@
-function [Lr, Kr_a, Krcr, KI_a, rhoa, sigmaResM, sigmaResB, Ksb] = Fracture_TT(flaw, weld, a, c, T, W, fyT, fuT, fyweldT, fuweldT, E, sigmaSdm, sigmaSdb, Yma, Yba, Mma,  Mba, Kmat)
+function [Lr, Kr_a, Krcr, KI_a, rhoa, sigmaResM, sigmaResB, Ksb] = Fracture_TT(flaw, weld, a, c, T, W, fyT, fuT, fyweldT, fuweldT, E, sigmaSdm, sigmaSdb, Yma, Yba, Ma, Mma,  Mba, Kmat)
 %% Plastic collape parameter Lr 
 % Local collapse analysis:
 % Cut-off value of Lr (to prevent plastic colapse)
@@ -7,25 +7,14 @@ if fyweldT == 0  % no weld
 else
     Lrmax = (fyweldT+fuweldT)/(2*fyweldT);
 end
-% Lrmax = (fy+fu)/(2*fy);
 % P.5 in BS7910:2013 A1 2015 Reference stress and/or limit load solutions for deep notched plates
 constraint = 2;
 sigmaref = referenceStress(flaw, constraint, a, c, T, W, sigmaSdb, sigmaSdm);
 if fyweldT == 0
-    Lr = min(Lrmax, sigmaref/fyT);
+    Lr = sigmaref/fyT;
 else
-    Lr = min(Lrmax, sigmaref/fyweldT);
+    Lr = sigmaref/fyweldT;
 end
-% Global analysis:
-% Flow strenght: 
-% fflow = (fyT + fuT) / 2;
-% Lrchord = (fflow / fyT) * (abs(Pa/Pcchord) + (Mai / Mcichord)^2 + abs(Mao/Maochord));
-% Lrbrace = (fflow / fyT) * (abs(Pa/Pcbrace) + (Mai / Mcibrace)^2 + abs(Mao/Maobrace));
-% if (crackLocation == 'chord')
-%     Lr = Lrchord;
-% elseif (crackLocation == 'brace')
-%     Lr = Lrbrace;
-% end
 
 %% Fracture collapse parameter Kr
 
@@ -94,7 +83,6 @@ elseif (chia <= 4) && (Lr > 1.05) && (KIs_a >0)
     rhoa = 0;
 end
 
-
 KI_a = KIp_a + KIs_a;
 
 Kr_a = KI_a/Kmat + rhoa;
@@ -103,7 +91,7 @@ Kr_a = KI_a/Kmat + rhoa;
 if fyT <= 1000
     deltaEpsilon = 0.037 * (1 - 0.001 * fyT);
 else
-    disp('Error in Fracture: Yield strength haqs to lower dan 1000MPa');
+    disp('Error in Fracture: Yield strength has to lower dan 1000MPa');
 return
 end
 lambda = max(1, 1 + E * deltaEpsilon/fyT);

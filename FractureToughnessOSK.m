@@ -32,9 +32,9 @@ C1 = 1.273;
 C2 = 6.09;
 SrefFy = C1 * exp(-(C2/(KmatB/sqrt(fyT))));
 SrefCTOD = fyT * SrefFy;
-% SrefCTOD = ratio*fyT;
 T_stressCTOD = min(0,betaCTOD*SrefCTOD);
-KmatCTOD = 948 + (KmatB - 948)*exp(0.019*(T_stressCTOD/10));
+
+KmatCTOD = 948 + (KmatB - 948)*exp(0.019*(min(0,T_stressCTOD/10)));
 
 % Adjustment for specimen size and crack front length:
 % L.9.2 and L.9.5 in BS7910:2013 A1 2015
@@ -50,7 +50,6 @@ while sign(fun(int(1))) == sign(fun(int(2))) && ii < 1e3
     ii      = ii + 1;
 end
 Lmax    = fzero(fun, int);
-
 
 % % polyroot
 % aa  = 632;
