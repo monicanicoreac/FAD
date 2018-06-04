@@ -43,6 +43,12 @@ elseif flaw == 7
     Mm = 1.12-0.23*(a/W) + 10.16*(a/W)^2-21.7*(a/W)^3 + 30.4*(a/W)^4;
     Mb = Mm;
     fw = 1;
+    %% Double edge crack in finite plate
+elseif flaw == 10
+    M = 1;
+    Mm = sqrt(1/(1-2*a/W))*(1.122*(1-a/W)-0.06*(a/W)^2+0.728*(a/W)^3);
+    Mb = Mm;
+    fw = 1;
     %% M.4.1 Surface flaws in plates
 elseif flaw == 2
      M = 1;

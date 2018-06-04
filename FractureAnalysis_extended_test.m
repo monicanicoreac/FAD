@@ -17,13 +17,10 @@ specimen_treat  = 'average_ctod';
 % specimen_treat  = 'magic_average_ctod';
 
 fname           = [specimen_type, '_', specimen_treat, '_to_Arpi.xlsx'];
-% fname_csv       = [specimen_type, '_', specimen_treat, '.csv'];
 if exist(fname, 'file')
     delete(fname)
 end
-% if exist(fname_csv, 'file')
-%     delete(fname_csv)
-% end
+
 [batch_name, CTOD, Lr_trunc_flag, Lr_sup] = get_ctod_data(specimen_type);
 
 switch lower(specimen_treat)
@@ -51,12 +48,8 @@ for ii = 1:n_batch
 %     load('ctodLT.mat')
 %     load('ctodLS.mat')
     load('SCF.mat')
+    
     index       = ii;
-    if (index >= 19) && (index <= 25)
-        FADtype = 1; % curve suitable for materials that do not exhibit a yield discontinuity
-    else
-        FADtype = 2; % curve suitable for materials that exhibit a yield discontinuity
-    end
 %     ctodLT      = ctodLT(index,1);
 %     ctodLS      = ctodLS(index,1);
 %     ctod        = ctod(index,1);
@@ -131,8 +124,7 @@ for ii = 1:n_batch
         %     fyT = fy;
         %     fuT = fu;
     end
-    % Increase in strain (eq. 8 in BS7910)
-    DeltaEpsilon = 0.0375 * (1 - 0.001 * fyT);
+
     % ---------------------------------------------------------------------
     % PERMANENT STRESS ULS
     % --------------------------------------------------------------------- 
@@ -148,6 +140,7 @@ for ii = 1:n_batch
         sigmaSdm = NIL(index,8) * 1E3 / (W*T);
     end
     sigmaSdb = 0;
+    
     % ---------------------------------------------------------------------
     % FRACTURE ANALYSIS
     % ---------------------------------------------------------------------
@@ -157,10 +150,7 @@ for ii = 1:n_batch
     if index == 1
         xlRange = [ 'A', num2str(1)];
 %         xlswrite('NIL.xlsx', {'Kr_a', 'Kr_c', 'Lr', 'KI_a', 'KI_c', 'Kmat_a', 'Kmati_c', 'rhoa', 'rhoc'}, 'Sheet1', xlRange);
-        xlswrite(fname, {'batch', 'specimen', 'E', 'fy', 'fu', '??', 'FADtype', 'Kr', 'Lr'}, 'Sheet1', xlRange);
-        xlswrite(fname, {'batch', 'specimen', 'CTOD', 'KI', 'Kmat', 'rho', 'Kr', 'Lr', 'Lr_trunc_flag', 'Lr_sup'}, 'Sheet2', xlRange);
-%         csvwrite(fname_csv, {'batch', 'specimen', 'E', 'fy', 'fu', '??', 'FADtype', 'Kr', 'Lr'});
-%         csvwrite(fname_csv, {'batch', 'specimen', 'CTOD', 'KI', 'Kmat', 'rho', 'Kr', 'Lr', 'Lr_trunc_flag', 'Lr_sup'}, 'Sheet2', xlRange);
+        xlswrite(fname, {'batch', 'specimen', 'CTOD', 'KI', 'Kmat', 'rho', 'Kr', 'Lr', 'Lr_trunc_flag', 'Lr_sup'}, 'Sheet1', xlRange);
     end
     
     n_specimen      = sum(~isnan(CTOD(ii,:)));
@@ -190,9 +180,7 @@ for ii = 1:n_batch
             KI                              = KI_a;
             batch                           = batch_name{ii};
             xlRange                         = [ 'A', num2str(row_num + shift_row)];
-            xlswrite(fname, {batch, specimen, E, fyT, fuT, DeltaEpsilon, FADtype, Kr, Lr}, 'Sheet1', xlRange);
-            xlswrite(fname, {batch, specimen, ctod, KI, Kmat, rho, Kr, Lr, Lr_tf, Lr_s}, 'Sheet2', xlRange);
-%             csvwrite(fname_csv, [batch, specimen, E, fyT, fuT, DeltaEpsilon, FADtype, Kr, Lr]);
+%             xlswrite(fname, {batch, specimen, ctod, KI, Kmat, rho, Kr, Lr, Lr_tf, Lr_s}, 'Sheet1', xlRange);
 % disp('_______')
         elseif (index==7) || (index == 8)
             [ Tstr_a, Tstr_c ] = T_stress( a+hole/2, c, T, sigmaSdm, sigmaSdb, flaw, W );
@@ -210,9 +198,7 @@ for ii = 1:n_batch
             KI                              = KI_a;
             batch                           = batch_name{ii};
             xlRange                         = [ 'A', num2str(row_num + shift_row)];
-            xlswrite(fname, {batch, specimen, E, fyT, fuT, DeltaEpsilon, FADtype, Kr, Lr}, 'Sheet1', xlRange);
-            xlswrite(fname, {batch, specimen, ctod, KI, Kmat, rho, Kr, Lr, Lr_tf, Lr_s}, 'Sheet2', xlRange);
-%              csvwrite(fname_csv, {batch, specimen, E, fyT, fuT, DeltaEpsilon, FADtype, Kr, Lr}, 'Sheet1', xlRange);
+%             xlswrite(fname, {batch, specimen, ctod, KI, Kmat, rho, Kr, Lr, Lr_tf, Lr_s}, 'Sheet1', xlRange);
 % disp('_______')            
         elseif (index == 9) || (index == 10)
             [ Tstr_a, Tstr_c ] = T_stress(a+hole/2, c, T, sigmaSdm, sigmaSdb, flaw, W );
@@ -230,9 +216,7 @@ for ii = 1:n_batch
             KI                              = KI_a;
             batch                           = batch_name{ii};
             xlRange                         = [ 'A', num2str(row_num + shift_row)];
-            xlswrite(fname, {batch, specimen, E, fyT, fuT, DeltaEpsilon, FADtype, Kr, Lr}, 'Sheet1', xlRange);
-            xlswrite(fname, {batch, specimen, ctod, KI, Kmat, rho, Kr, Lr, Lr_tf, Lr_s}, 'Sheet2', xlRange);
-%             csvwrite(fname_csv, {batch, specimen, E, fyT, fuT, DeltaEpsilon, FADtype, Kr, Lr}, 'Sheet1', xlRange);
+%             xlswrite(fname, {batch, specimen, ctod, KI, Kmat, rho, Kr, Lr, Lr_tf, Lr_s}, 'Sheet1', xlRange);
 % disp('_______')
         elseif (index >= 15) && (index <= 18)
             [ Tstr_a, Tstr_c ] = T_stress( a, c, T, sigmaSdm, sigmaSdb, flaw, W );
@@ -249,9 +233,7 @@ for ii = 1:n_batch
             KI                              = KI_a;
             batch                           = batch_name{ii};
             xlRange                         = [ 'A', num2str(row_num + shift_row)];
-            xlswrite(fname, {batch, specimen, E, fyT, fuT, DeltaEpsilon, FADtype, Kr, Lr}, 'Sheet1', xlRange);
-            xlswrite(fname, {batch, specimen, ctod, KI, Kmat, rho, Kr, Lr, Lr_tf, Lr_s}, 'Sheet2', xlRange);
-%             csvwrite(fname_csv, {batch, specimen, E, fyT, fuT, DeltaEpsilon, FADtype, Kr, Lr}, 'Sheet1', xlRange);
+%             xlswrite(fname, {batch, specimen, ctod, KI, Kmat, rho, Kr, Lr, Lr_tf, Lr_s}, 'Sheet1', xlRange);
 % disp('_______')
         else
             [ Tstr_a, Tstr_c ] = T_stress( a, c, T, sigmaSdm, sigmaSdb, flaw, W );
@@ -288,22 +270,20 @@ for ii = 1:n_batch
 %             end
             batch                           = batch_name{ii};
             xlRange                         = [ 'A', num2str(row_num + shift_row)];
-            xlswrite(fname, {batch, specimen, E, fyT, fuT, DeltaEpsilon, FADtype, Kr, Lr}, 'Sheet1', xlRange);
-            xlswrite(fname, {batch, specimen, ctod, KI, Kmat, rho, Kr, Lr, Lr_tf, Lr_s}, 'Sheet2', xlRange);
-%            csvwrite(fname_csv, {batch, specimen, E, fyT, fuT, DeltaEpsilon, FADtype, Kr, Lr});
+%             xlswrite(fname, {batch, specimen, ctod, KI, Kmat, rho, Kr, Lr, Lr_tf, Lr_s}, 'Sheet1', xlRange);
         end
 % disp('_______')        
         row_num     = row_num + 1;
         specimen    = specimen + 1;
     end
-%     OUT(index,1) = sigmaSdm+sigmaSdb;
-%     OUT(index,2) = sigmaResM;
-%     OUT(index,3) = sigmaResB;
-%     OUT(index,4) = Ksb;
-%     OUT(index,5) = KI;
-%     OUT(index,6) = rho;
-%     OUT(index,7) = Kmat;
-%     OUT(index,8) = Kr;
-%     OUT(index,9) = Lr;
+    OUT(index,1) = sigmaSdm+sigmaSdb;
+OUT(index,2) = sigmaResM;
+OUT(index,3) = sigmaResB;
+OUT(index,4) = Ksb;
+OUT(index,5) = KI;
+OUT(index,6) = rho;
+OUT(index,7) = Kmat;
+OUT(index,8) = Kr;
+OUT(index,9) = Lr;
 end
 

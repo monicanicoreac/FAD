@@ -6,26 +6,26 @@ ac = a/c;
 ca = c/a;
 aT = a/T;
 LT = L/T;
-% if (a <= 0.005*T)
-%     disp('Error calculating weld geometry factor in Subroutine SIMfactor_Mk_3D: a/T < 0.005')
-%     return
-% end 
-% if (a >= 0.9*T)
-% 	disp('Error calculating weld geometry factor in Subroutine SIMfactor_Mk_3D: a/T > 0.9')
-%     return
-% end 
-% % if (a < 0.1*c)
-% % 	disp('Error calculating weld geometry factor in Subroutine SIMfactor_Mk_3D: a/c < 0.1')
-% %     return
-% % end
-% if (a > c)
-% 	disp('Error calculating weld geometry factor in Subroutine SIMfactor_Mk_3D: a/c > 1')
-%     return
-% end 
-% if L < 0.5*T
-%     disp('Error calculating weld geometry factor in Subroutine SIMfactor_Mk_3D: L/T < 0.5')
+if (a <= 0.005*T)
+    disp('Error calculating weld geometry factor in Subroutine SIMfactor_Mk_3D: a/T < 0.005')
+    return
+end 
+if (a >= 0.9*T)
+	disp('Error calculating weld geometry factor in Subroutine SIMfactor_Mk_3D: a/T > 0.9')
+    return
+end 
+% if (a < 0.1*c)
+% 	disp('Error calculating weld geometry factor in Subroutine SIMfactor_Mk_3D: a/c < 0.1')
 %     return
 % end
+if (a > c)
+	disp('Error calculating weld geometry factor in Subroutine SIMfactor_Mk_3D: a/c > 1')
+    return
+end 
+if L < 0.5*T
+    disp('Error calculating weld geometry factor in Subroutine SIMfactor_Mk_3D: L/T < 0.5')
+    return
+end
 if (L > 2.75*T) 
     LT = 2.75;
 end
@@ -148,4 +148,3 @@ Mkba = Mkba * fphia * frhoba;
 Mkmc = Mkmc * fphic * frhomc;
 Mkbc = Mkbc * fphic * frhobc;
 end
-    
